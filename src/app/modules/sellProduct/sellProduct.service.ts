@@ -1,16 +1,11 @@
+/* eslint-disable no-undef */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { SortOrder, Types } from 'mongoose';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
-// import {
-//   IinventoryProduct,
-//   IinventoryProductFilterRequest,
-// } from './addIntoInventory.interface';
-// import { InventoryproductSearchableFields } from './addIntoInventory.constant';
-// import { InventoryProducts } from './addIntoInventory.model';
-//import { Products } from '../products/products.model';
+
 import {
   ISellProduct,
   ISellProductFilterRequest,
@@ -19,12 +14,7 @@ import { SellproductSearchableFields } from './sellProduct.constant';
 import { SellProducts } from './sellProduct.model';
 import { InventoryProducts } from '../addIntoInventory/addIntoInventory.model';
 import { IinventoryProduct } from '../addIntoInventory/addIntoInventory.interface';
-//import { ICategory, ICategoryFilterRequest } from './category.interface';
-//import { Category } from './category.model';
-//import { categorySearchableFields } from './category.constant';
-// import { IProduct, IProductFilterRequest } from './products.interface';
-// import { productSearchableFields } from './products.constant';
-// import { Products } from './products.model';
+
 type IUserInfo = {
   userName: string;
   userEmail: string;
@@ -101,6 +91,7 @@ type IdataInven = {
   color: string;
   quantity: 1;
 };
+
 const addSingleSellProduct = async (
   id: string,
   dataInven: IdataInven,
@@ -111,14 +102,14 @@ const addSingleSellProduct = async (
   });
 
   console.log('SellInventoryProduct:', SellInventoryProduct);
-  //@ts-ignore
-  if (SellInventoryProduct.quantity <= 1) {
-    await InventoryProducts.findOneAndDelete({ _id: id });
-  }
   if (SellInventoryProduct) {
     const existingProduct = await SellProducts.findOne({
       'userInfo.userEmail': SellInventoryProduct.userInfo.userEmail,
       name: SellInventoryProduct.name,
+      createdAt: {
+        $gte: new Date(new Date().setHours(0, 0, 0, 0)), // Start of current day
+        $lt: new Date(new Date().setHours(23, 59, 59, 999)), // End of current day
+      },
     });
     const updated2 = {
       ...SellInventoryProduct?.toObject(),
@@ -141,6 +132,10 @@ const addSingleSellProduct = async (
         updated2,
         { new: true },
       );
+      //@ts-ignore
+      if (SellInventoryProduct.quantity <= 1) {
+        await InventoryProducts.findOneAndDelete({ _id: id });
+      }
       console.log('Updated product:', result);
       return result;
     } else {
@@ -152,92 +147,15 @@ const addSingleSellProduct = async (
         updated2,
         { new: true },
       );
+      //@ts-ignore
+      if (SellInventoryProduct.quantity <= 1) {
+        await InventoryProducts.findOneAndDelete({ _id: id });
+      }
       return result;
     }
   }
-  // if (SellInventoryProduct) {
-  //   const InventoryProduct = {
-  //     userInfo: SellInventoryProduct.userInfo,
-  //     image: SellInventoryProduct.image,
-  //     name: SellInventoryProduct.name,
-  //     price: SellInventoryProduct.price,
-  //     occation: SellInventoryProduct.occation,
-  //     recipient: SellInventoryProduct.recipient,
-  //     category: SellInventoryProduct.category,
-  //     theme: SellInventoryProduct.theme,
-  //     brand: SellInventoryProduct.brand,
-  //     color: SellInventoryProduct.color,
-  //     quantity: SellInventoryProduct.quantity! - 1,
-  //   };
-  //   const newProduct = {
-  //     userInfo: SellInventoryProduct.userInfo,
-  //     image: SellInventoryProduct.image,
-  //     name: SellInventoryProduct.name,
-  //     price: SellInventoryProduct.price,
-  //     occation: SellInventoryProduct.occation,
-  //     recipient: SellInventoryProduct.recipient,
-  //     category: SellInventoryProduct.category,
-  //     theme: SellInventoryProduct.theme,
-  //     brand: SellInventoryProduct.brand,
-  //     color: SellInventoryProduct.color,
-  //     quantity: 1,
-  //   };
-  //   console.log('newProducts:', newProduct);
-  //   // const newInvenData = {
-  //   //   dataInven,
-  //   //   quantity: 1,
-  //   // };
-  //   //console.log('newInvalidate:', newInvenData);
-  //   const existingSellProducts = await SellProducts.findOne({
-  //     name: newProduct?.name,
-  //   });
-
-  //   if (existingSellProducts) {
-  //     const newExistProduct = {
-  //       userInfo: existingSellProducts.userInfo,
-  //       image: existingSellProducts.image,
-  //       name: existingSellProducts.name,
-  //       price: existingSellProducts.price,
-  //       occation: existingSellProducts.occation,
-  //       recipient: existingSellProducts.recipient,
-  //       category: existingSellProducts.category,
-  //       theme: existingSellProducts.theme,
-  //       brand: existingSellProducts.brand,
-  //       color: existingSellProducts.color,
-  //       quantity: existingSellProducts.quantity! + 1,
-  //     };
-  //     const result = await SellProducts.findOneAndUpdate(
-  //       { name: newProduct?.name },
-  //       newExistProduct as any,
-  //       {
-  //         new: true,
-  //       },
-  //     );
-  //     await InventoryProducts.findOneAndUpdate(
-  //       { name: InventoryProduct?.name },
-  //       InventoryProduct as any,
-  //       {
-  //         new: true,
-  //       },
-  //     );
-
-  //     console.log('result:', result);
-  //     return result;
-  //   } else {
-  //     const result = await SellProducts.create(dataInven);
-  //     await InventoryProducts.findOneAndUpdate(
-  //       { name: InventoryProduct?.name },
-  //       InventoryProduct as any,
-  //       {
-  //         new: true,
-  //       },
-  //     );
-
-  //     return result;
-  //   }
-  // }
-  // return SellInventoryProduct;
 };
+
 const addSingleDuplicateProduct = async (
   id: string,
   data: IinventoryProduct,

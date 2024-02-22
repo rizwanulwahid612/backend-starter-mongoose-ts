@@ -21,6 +21,7 @@ var __rest = (this && this.__rest) || function (s, e) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SellProductsService = void 0;
+/* eslint-disable no-undef */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const mongoose_1 = require("mongoose");
@@ -78,14 +79,14 @@ const addSingleSellProduct = (id, dataInven) => __awaiter(void 0, void 0, void 0
         _id: new mongoose_1.Types.ObjectId(id),
     });
     console.log('SellInventoryProduct:', SellInventoryProduct);
-    //@ts-ignore
-    if (SellInventoryProduct.quantity <= 1) {
-        yield addIntoInventory_model_1.InventoryProducts.findOneAndDelete({ _id: id });
-    }
     if (SellInventoryProduct) {
         const existingProduct = yield sellProduct_model_1.SellProducts.findOne({
             'userInfo.userEmail': SellInventoryProduct.userInfo.userEmail,
             name: SellInventoryProduct.name,
+            createdAt: {
+                $gte: new Date(new Date().setHours(0, 0, 0, 0)), // Start of current day
+                $lt: new Date(new Date().setHours(23, 59, 59, 999)), // End of current day
+            },
         });
         const updated2 = Object.assign(Object.assign({}, SellInventoryProduct === null || SellInventoryProduct === void 0 ? void 0 : SellInventoryProduct.toObject()), { quantity: SellInventoryProduct.quantity - 1 });
         if (existingProduct) {
@@ -93,6 +94,10 @@ const addSingleSellProduct = (id, dataInven) => __awaiter(void 0, void 0, void 0
             const updatedProduct = Object.assign(Object.assign({}, existingProduct.toObject()), { quantity: existingProduct.quantity + 1 });
             const result = yield sellProduct_model_1.SellProducts.findOneAndUpdate({ _id: existingProduct._id }, updatedProduct, { new: true });
             yield addIntoInventory_model_1.InventoryProducts.findOneAndUpdate({ _id: SellInventoryProduct._id }, updated2, { new: true });
+            //@ts-ignore
+            if (SellInventoryProduct.quantity <= 1) {
+                yield addIntoInventory_model_1.InventoryProducts.findOneAndDelete({ _id: id });
+            }
             console.log('Updated product:', result);
             return result;
         }
@@ -100,89 +105,167 @@ const addSingleSellProduct = (id, dataInven) => __awaiter(void 0, void 0, void 0
             const result = yield sellProduct_model_1.SellProducts.create(dataInven);
             console.log('Added new Sell product:', result);
             yield addIntoInventory_model_1.InventoryProducts.findOneAndUpdate({ _id: SellInventoryProduct._id }, updated2, { new: true });
+            //@ts-ignore
+            if (SellInventoryProduct.quantity <= 1) {
+                yield addIntoInventory_model_1.InventoryProducts.findOneAndDelete({ _id: id });
+            }
             return result;
         }
     }
-    // if (SellInventoryProduct) {
-    //   const InventoryProduct = {
-    //     userInfo: SellInventoryProduct.userInfo,
-    //     image: SellInventoryProduct.image,
-    //     name: SellInventoryProduct.name,
-    //     price: SellInventoryProduct.price,
-    //     occation: SellInventoryProduct.occation,
-    //     recipient: SellInventoryProduct.recipient,
-    //     category: SellInventoryProduct.category,
-    //     theme: SellInventoryProduct.theme,
-    //     brand: SellInventoryProduct.brand,
-    //     color: SellInventoryProduct.color,
-    //     quantity: SellInventoryProduct.quantity! - 1,
-    //   };
-    //   const newProduct = {
-    //     userInfo: SellInventoryProduct.userInfo,
-    //     image: SellInventoryProduct.image,
-    //     name: SellInventoryProduct.name,
-    //     price: SellInventoryProduct.price,
-    //     occation: SellInventoryProduct.occation,
-    //     recipient: SellInventoryProduct.recipient,
-    //     category: SellInventoryProduct.category,
-    //     theme: SellInventoryProduct.theme,
-    //     brand: SellInventoryProduct.brand,
-    //     color: SellInventoryProduct.color,
-    //     quantity: 1,
-    //   };
-    //   console.log('newProducts:', newProduct);
-    //   // const newInvenData = {
-    //   //   dataInven,
-    //   //   quantity: 1,
-    //   // };
-    //   //console.log('newInvalidate:', newInvenData);
-    //   const existingSellProducts = await SellProducts.findOne({
-    //     name: newProduct?.name,
-    //   });
-    //   if (existingSellProducts) {
-    //     const newExistProduct = {
-    //       userInfo: existingSellProducts.userInfo,
-    //       image: existingSellProducts.image,
-    //       name: existingSellProducts.name,
-    //       price: existingSellProducts.price,
-    //       occation: existingSellProducts.occation,
-    //       recipient: existingSellProducts.recipient,
-    //       category: existingSellProducts.category,
-    //       theme: existingSellProducts.theme,
-    //       brand: existingSellProducts.brand,
-    //       color: existingSellProducts.color,
-    //       quantity: existingSellProducts.quantity! + 1,
-    //     };
-    //     const result = await SellProducts.findOneAndUpdate(
-    //       { name: newProduct?.name },
-    //       newExistProduct as any,
-    //       {
-    //         new: true,
-    //       },
-    //     );
-    //     await InventoryProducts.findOneAndUpdate(
-    //       { name: InventoryProduct?.name },
-    //       InventoryProduct as any,
-    //       {
-    //         new: true,
-    //       },
-    //     );
-    //     console.log('result:', result);
-    //     return result;
-    //   } else {
-    //     const result = await SellProducts.create(dataInven);
-    //     await InventoryProducts.findOneAndUpdate(
-    //       { name: InventoryProduct?.name },
-    //       InventoryProduct as any,
-    //       {
-    //         new: true,
-    //       },
-    //     );
-    //     return result;
-    //   }
-    // }
-    // return SellInventoryProduct;
 });
+//1
+// const addSingleSellProduct = async (
+//   id: string,
+//   dataInven: IdataInven,
+// ): Promise<any> => {
+//   // Find the booking by ID
+//   const SellInventoryProduct = await InventoryProducts.findOne({
+//     _id: new Types.ObjectId(id),
+//   });
+//   console.log('SellInventoryProduct:', SellInventoryProduct);
+//   if (SellInventoryProduct) {
+//     const existingProduct = await SellProducts.findOne({
+//       'userInfo.userEmail': SellInventoryProduct.userInfo.userEmail,
+//       name: SellInventoryProduct.name,
+//     });
+//     const updated2 = {
+//       ...SellInventoryProduct?.toObject(),
+//       quantity: SellInventoryProduct.quantity! - 1,
+//     };
+//     if (existingProduct) {
+//       const updatedProduct = {
+//         ...existingProduct.toObject(),
+//         quantity: existingProduct.quantity! + 1,
+//       };
+//       //@ts-ignore
+//       const createdAt = new Date(existingProduct.createdAt).toDateString();
+//       const currentDate = new Date().toDateString();
+//       if (createdAt === currentDate && existingProduct.name) {
+//         const result = await SellProducts.findOneAndUpdate(
+//           { _id: existingProduct._id },
+//           updatedProduct,
+//           { new: true },
+//         );
+//         await InventoryProducts.findOneAndUpdate(
+//           { _id: SellInventoryProduct._id },
+//           updated2,
+//           { new: true },
+//         );
+//         //@ts-ignore
+//         if (SellInventoryProduct.quantity <= 1) {
+//           await InventoryProducts.findOneAndDelete({ _id: id });
+//         }
+//         console.log('Updated product:', result);
+//         return result;
+//       } else {
+//         const result = await SellProducts.create(dataInven);
+//         console.log('Added new Sell product:', result);
+//         await InventoryProducts.findOneAndUpdate(
+//           { _id: SellInventoryProduct._id },
+//           updated2,
+//           { new: true },
+//         );
+//         //@ts-ignore
+//         if (SellInventoryProduct.quantity <= 1) {
+//           await InventoryProducts.findOneAndDelete({ _id: id });
+//         }
+//         return result;
+//       }
+//     } else {
+//       const result = await SellProducts.create(dataInven);
+//       console.log('Added new Sell product:', result);
+//       await InventoryProducts.findOneAndUpdate(
+//         { _id: SellInventoryProduct._id },
+//         updated2,
+//         { new: true },
+//       );
+//       //@ts-ignore
+//       if (SellInventoryProduct.quantity <= 1) {
+//         await InventoryProducts.findOneAndDelete({ _id: id });
+//       }
+//       return result;
+//     }
+//   }
+// };
+// const addSingleSellProduct = async (
+//   id: string,
+//   dataInven: IdataInven,
+// ): Promise<any> => {
+//   // Find the booking by ID
+//   const SellInventoryProduct = await InventoryProducts.findOne({
+//     _id: new Types.ObjectId(id),
+//   });
+//   console.log('SellInventoryProduct:', SellInventoryProduct);
+//   if (SellInventoryProduct) {
+//     const existingProduct = await SellProducts.findOne({
+//       'userInfo.userEmail': SellInventoryProduct.userInfo.userEmail,
+//       name: SellInventoryProduct.name,
+//     });
+//     const updated2 = {
+//       ...SellInventoryProduct?.toObject(),
+//       quantity: SellInventoryProduct.quantity! - 1,
+//     };
+//     //@ts-ignore
+//     // const createdAt = new Date(existingProduct.createdAt).toDateString();
+//     // const currentDate = new Date().toDateString();
+//     // Product already exists, update quantity
+//     // console.log('createdAt:', createdAt, 'currentData:', currentDate);
+//     if (existingProduct) {
+//       const updatedProduct = {
+//         ...existingProduct.toObject(),
+//         quantity: existingProduct.quantity! + 1,
+//       };
+//       if (
+//         //@ts-ignore
+//         new Date(existingProduct.createdAt).toDateString() ===
+//         new Date().toDateString()
+//       ) {
+//         const result = await SellProducts.findOneAndUpdate(
+//           { _id: existingProduct._id },
+//           updatedProduct,
+//           { new: true },
+//         );
+//         await InventoryProducts.findOneAndUpdate(
+//           { _id: SellInventoryProduct._id },
+//           updated2,
+//           { new: true },
+//         );
+//         //@ts-ignore
+//         if (SellInventoryProduct.quantity <= 1) {
+//           await InventoryProducts.findOneAndDelete({ _id: id });
+//         }
+//         console.log('Updated product:', result);
+//         return result;
+//       } else {
+//         const result = await SellProducts.create(dataInven);
+//         console.log('Added new Sell product:', result);
+//         await InventoryProducts.findOneAndUpdate(
+//           { _id: SellInventoryProduct._id },
+//           updated2,
+//           { new: true },
+//         );
+//         //@ts-ignore
+//         if (SellInventoryProduct.quantity <= 1) {
+//           await InventoryProducts.findOneAndDelete({ _id: id });
+//         }
+//         return result;
+//       }
+//     } else {
+//       const result = await SellProducts.create(dataInven);
+//       console.log('Added new Sell product:', result);
+//       await InventoryProducts.findOneAndUpdate(
+//         { _id: SellInventoryProduct._id },
+//         updated2,
+//         { new: true },
+//       );
+//       //@ts-ignore
+//       if (SellInventoryProduct.quantity <= 1) {
+//         await InventoryProducts.findOneAndDelete({ _id: id });
+//       }
+//       return result;
+//     }
+//   }
+// };
 const addSingleDuplicateProduct = (id, data) => __awaiter(void 0, void 0, void 0, function* () {
     // Find the booking by ID
     const duplicateProduct = yield addIntoInventory_model_1.InventoryProducts.findOne({
